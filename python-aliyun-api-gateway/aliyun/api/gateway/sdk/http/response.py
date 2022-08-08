@@ -1,10 +1,8 @@
-from urllib.parse import splittype
-
-from aliyun.api.gateway.sdk.http.request import Request
-
 from http import client
+import json
 import urllib
 from aliyun.api.gateway.sdk.common import constant
+from aliyun.api.gateway.sdk.http.request import Request
 
 
 class Response(Request):
@@ -53,7 +51,9 @@ class Response(Request):
             self.__connection.connect()
             post_data = None
             if self.get_content_type() == constant.CONTENT_TYPE_FORM and self.get_body():
-                post_data = urllib.urlencode(self.get_body())
+                post_data = urllib.parse.urlencode(self.get_body())
+            elif self.get_content_type() == constant.CONTENT_TYPE_JSON and self.get_body():
+                post_data = json.dumps(self.get_body())
             else:
                 post_data = self.get_body()
             self.__connection.request(method=self.get_method(), url=self.get_url(), body=post_data,
@@ -89,7 +89,9 @@ class Response(Request):
             self.__connection.connect()
             post_data = None
             if self.get_content_type() == constant.CONTENT_TYPE_FORM and self.get_body():
-                post_data = urllib.urlencode(self.get_body())
+                post_data = urllib.parse.urlencode(self.get_body())
+            elif self.get_content_type() == constant.CONTENT_TYPE_JSON and self.get_body():
+                post_data = json.dumps(self.get_body())
             else:
                 post_data = self.get_body()
             self.__connection.request(method=self.get_method(), url=self.get_url(), body=post_data,

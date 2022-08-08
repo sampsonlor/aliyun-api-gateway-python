@@ -1,7 +1,8 @@
 from aliyun.api.gateway.sdk.util import UUIDUtil, DateUtil
-from aliyun.api.gateway.sdk import Response
+from aliyun.api.gateway.sdk.http.response import Response
 from aliyun.api.gateway.sdk.common import constant
 from aliyun.api.gateway.sdk.auth import sha_hmac256, signature_composer, md5_tool
+import json
 
 
 class DefaultClient:
@@ -48,8 +49,11 @@ class DefaultClient:
         else:
             headers[constant.HTTP_HEADER_ACCEPT] = constant.CONTENT_TYPE_JSON
 
-        if constant.POST == request.get_method() and constant.CONTENT_TYPE_STREAM == request.get_content_type():
-            headers[constant.HTTP_HEADER_CONTENT_MD5] = md5_tool.get_md5_base64_str(request.get_body())
+        if constant.POST == request.get_method():
+            if constant.CONTENT_TYPE_STREAM == request.get_content_type():
+                headers[constant.HTTP_HEADER_CONTENT_MD5] = md5_tool.get_md5_base64_str(request.get_body())
+            elif constant.CONTENT_TYPE_JSON == request.get_content_type():
+                headers[constant.HTTP_HEADER_CONTENT_MD5] = md5_tool.get_md5_base64_str(json.dumps(request.get_body()))
             str_to_sign = signature_composer.build_sign_str(uri=request.get_url(), method=request.get_method(),
                                                             headers=headers)
         else:
